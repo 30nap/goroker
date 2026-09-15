@@ -106,8 +106,13 @@ type DebugConfig struct {
 func Default() Config {
 	return Config{
 		Broker: BrokerConfig{
-			Name:        "unknown",
-			DisplayName: "unknown",
+			Name:        "mofid",
+			DisplayName: "Mofid Easy Trader",
+			BaseURL:     "https://d.easytrader.ir/",
+			TradingURL:  "https://d.easytrader.ir/",
+			// LoginURL is left empty on purpose: the login entry point has
+			// not been established yet, and the adapter then stays on the
+			// base URL and detects the login form there.
 		},
 		Browser: BrowserConfig{
 			Headless:               false,

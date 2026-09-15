@@ -6,14 +6,15 @@
 # GOROKER_WATCH_INTERVAL=5s or GOROKER_BROWSER_HEADLESS=true.
 
 broker:
-  # Adapter to use. "iranbroker" is the adapter in internal/broker/iranbroker.
-  name: iranbroker
+  # Adapter to use. "mofid" is the adapter in internal/broker/mofid.
+  name: mofid
   # Name shown by `goroker status`.
-  display_name: unknown
-  # Filled in during broker discovery (Phase 2).
-  base_url: ""
+  display_name: Mofid Easy Trader
+  base_url: "https://d.easytrader.ir/"
+  # Left empty until broker discovery establishes the login entry point; the
+  # adapter then looks for the login form on the base URL.
   login_url: ""
-  trading_url: ""
+  trading_url: "https://d.easytrader.ir/"
 
 browser:
   # Trading interaction should be visible. Keep this false.

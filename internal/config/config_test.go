@@ -43,7 +43,7 @@ func TestLoadFileAndEnvironmentOverride(t *testing.T) {
 	path := filepath.Join(home, "config.yaml")
 	content := `
 broker:
-  name: iranbroker
+  name: mofid
   display_name: My Broker
   base_url: https://example.invalid/
 browser:
@@ -64,7 +64,7 @@ logging:
 	if err != nil {
 		t.Fatalf("Load() = %v", err)
 	}
-	if cfg.Broker.Name != "iranbroker" || cfg.Broker.DisplayName != "My Broker" {
+	if cfg.Broker.Name != "mofid" || cfg.Broker.DisplayName != "My Broker" {
 		t.Fatalf("broker = %+v, want the file values", cfg.Broker)
 	}
 	if cfg.Watch.Interval != 3*time.Second {

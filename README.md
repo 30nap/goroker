@@ -1,8 +1,8 @@
 # Goroker
 
-Goroker is a local command-line assistant that drives an Iranian stock
-brokerage's **web UI** through Chromium, because the brokerage has no official
-API. It can sign in, restore a session, read live quotes, watch for a target
+Goroker is a local command-line assistant that drives **Mofid Easy Trader**
+(`https://d.easytrader.ir/`) through Chromium, because the brokerage has no
+official API. It can sign in, restore a session, read live quotes, watch for a target
 price, prepare a BUY order, validate it against the page, and submit it **only
 after you type an explicit confirmation**.
 
@@ -21,7 +21,7 @@ after you type an explicit confirmation**.
 | Phase | Scope | State |
 | --- | --- | --- |
 | 1 | Module, CLI, config, logging, domain model, broker/browser abstractions, state machine, tests | **done** |
-| 2 | Broker discovery: inspect the real site, write `docs/broker-ui-analysis.md`, fill in selectors | not started |
+| 2 | Broker discovery: inspect the real site, write `docs/broker-ui-analysis.md`, fill in selectors | **in progress** — `goroker inspect` is ready, selectors pending |
 | 3 | `login` / `status` against the real site | blocked on Phase 2 |
 | 4 | `quote` / `watch` against the real site | blocked on Phase 2 |
 | 5 | `buy --dry-run` against the real order form | blocked on Phase 2 |
@@ -83,9 +83,9 @@ This launches Chromium with the persistent profile, opens the brokerage, and:
 1. reuses the restored session if it is still valid;
 2. otherwise opens the login page and fills in your username and password **if**
    they are configured locally;
-3. **pauses** if a CAPTCHA, OTP, SMS code, device confirmation or any other
-   security challenge appears, so you can complete it yourself in the browser
-   window;
+3. **pauses** when the SMS one-time code (Easy Trader always asks for one on a
+   fresh login), a device confirmation or any other security challenge appears,
+   so you can complete it yourself in the browser window;
 4. continues once the site reports a signed-in session.
 
 Goroker never tries to solve or bypass a security challenge, and never works
@@ -97,7 +97,7 @@ Credentials are read only at the moment the login form is filled, and are never
 logged, printed, or written to the configuration file.
 
 * **OS keyring (preferred):** stored under service `goroker`, account =
-  the broker name from your configuration.
+  the broker name from your configuration (`mofid`).
 * **Environment variables (development):** `GOROKER_USERNAME` and
   `GOROKER_PASSWORD`, optionally through a git-ignored `.env`
   (see [`.env.example`](.env.example)).
@@ -232,6 +232,50 @@ A dry run does everything up to and including validation, and then stops. It
 **cannot** submit: the submission guard refuses while dry-run is set, and the
 flow never reaches the confirmation prompt. Use it while developing.
 
+## Broker discovery (`goroker inspect`)
+
+Goroker cannot know which element on the page is the price input, and it never
+guesses. `internal/broker/mofid/selectors.go` ships **empty**, and every DOM
+access goes through a check that aborts when a selector is unset.
+
+To establish them, run on your own machine, signed in to your own account:
+
+```bash
+goroker inspect
+```
+
+This opens the brokerage in a visible Chromium with your persistent profile and
+then **only reads** the page — it never clicks, never fills a form and never
+submits. You drive the site; the terminal takes snapshots on request:
+
+```text
+snap LABEL [CSS]   save a sanitised snapshot of the page or of matching elements
+text CSS           print the text of the first few matching elements
+count CSS          count matching elements
+url                print the current URL
+quit               close the browser and exit
+```
+
+Snapshots land in `~/.goroker/debug/inspect/` and are sanitised first: scripts
+and inline styles are dropped, form values are replaced, and account numbers,
+phone numbers, e-mail addresses and long opaque tokens are redacted. Class
+names, ids, `data-*` and `aria-*` attributes and prices survive, because that is
+what selectors are written from. Sanitising is best effort — **read a snapshot
+before you share it**.
+
+The step-by-step recipe, and the table of which selector comes from which
+snapshot, are in [`docs/broker-ui-analysis.md`](docs/broker-ui-analysis.md).
+
+Once the selectors are known they go into `internal/broker/mofid/selectors.go`,
+or into `~/.goroker/selectors.yaml` to fix a UI change without rebuilding:
+
+```yaml
+best_ask: "#best-ask"
+price_input: "#order-price"
+market_open_text:
+  - "بازار باز است"
+```
+
 ## Security
 
 * No credentials in source code, README, tests, examples, config files, command
@@ -265,7 +309,7 @@ that submits without an interactive confirmation.
 Broker discovery has not filled that selector in yet, or the brokerage changed
 its UI. Inspect the page in a visible Chromium window, update
 `docs/broker-ui-analysis.md`, and set the selector either in
-`internal/broker/iranbroker/selectors.go` or, without rebuilding, in
+`internal/broker/mofid/selectors.go` or, without rebuilding, in
 `~/.goroker/selectors.yaml`.
 
 **`ABORT: authentication state uncertain`**
@@ -290,7 +334,8 @@ cmd/                     Cobra commands: parse input, print results
 internal/domain/         types and rules: orders, quotes, market, state machine
 internal/application/    use cases: login, quote, watch, order lifecycle
 internal/broker/         brokerage abstraction + registry + submit guard
-internal/broker/iranbroker/  the one place DOM selectors are allowed to exist
+internal/broker/mofid/   the one place DOM selectors are allowed to exist
+internal/inspect/        sanitiser for broker-discovery snapshots
 internal/browser/        Rod/Chromium wrapper, persistent profile, screenshots
 internal/config/         ~/.goroker/config.yaml + environment overrides
 internal/storage/        OS keyring credential access
@@ -298,7 +343,7 @@ internal/logging/        slog setup, event names, secret redaction
 ```
 
 Dependencies point inwards: `cmd` → `application` → `broker`/`domain`. No
-brokerage-specific selector appears outside `internal/broker/iranbroker`, and no
+brokerage-specific selector appears outside `internal/broker/mofid`, and no
 domain or application code knows what a CSS selector is.
 
 Submission safety is enforced three times over:

@@ -13,7 +13,7 @@ import (
 
 	"github.com/30nap/goroker/internal/application"
 	"github.com/30nap/goroker/internal/broker"
-	_ "github.com/30nap/goroker/internal/broker/iranbroker" // register the adapter
+	_ "github.com/30nap/goroker/internal/broker/mofid" // register the adapter
 	"github.com/30nap/goroker/internal/browser"
 	"github.com/30nap/goroker/internal/config"
 	"github.com/30nap/goroker/internal/domain"
@@ -60,6 +60,7 @@ interactive confirmation typed immediately before submission.`,
 		newQuoteCommand(),
 		newWatchCommand(),
 		newBuyCommand(),
+		newInspectCommand(),
 	)
 	return root
 }

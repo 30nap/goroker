@@ -1,4 +1,4 @@
-package iranbroker_test
+package mofid_test
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/30nap/goroker/internal/broker/iranbroker"
+	"github.com/30nap/goroker/internal/broker/mofid"
 	"github.com/30nap/goroker/internal/domain"
 )
 
@@ -16,12 +16,12 @@ import (
 // matching some other element.
 func TestUnconfiguredSelectorFailsClosed(t *testing.T) {
 	for _, value := range []string{"", "   ", "\t\n"} {
-		if _, err := iranbroker.Require("price_input", value); !errors.Is(err, domain.ErrSelectorMissing) {
+		if _, err := mofid.Require("price_input", value); !errors.Is(err, domain.ErrSelectorMissing) {
 			t.Fatalf("Require(%q) = %v, want ErrSelectorMissing", value, err)
 		}
 	}
 
-	got, err := iranbroker.Require("price_input", "#order-price")
+	got, err := mofid.Require("price_input", "#order-price")
 	if err != nil {
 		t.Fatalf("Require() = %v, want nil", err)
 	}
@@ -34,7 +34,7 @@ func TestUnconfiguredSelectorFailsClosed(t *testing.T) {
 // invented: the compiled-in set stays empty until the real brokerage UI has
 // been inspected.
 func TestDefaultSelectorsAreEmpty(t *testing.T) {
-	sel := iranbroker.Default()
+	sel := mofid.Default()
 	if sel.Configured() {
 		t.Fatal("the default selector set claims to be configured")
 	}
@@ -50,7 +50,7 @@ func TestDefaultSelectorsAreEmpty(t *testing.T) {
 // broker UI change can be fixed without rebuilding.
 func TestLoadOverrides(t *testing.T) {
 	dir := t.TempDir()
-	path := filepath.Join(dir, iranbroker.SelectorsFileName)
+	path := filepath.Join(dir, mofid.SelectorsFileName)
 	content := `
 best_ask: "#best-ask"
 price_input: "#order-price"
@@ -61,7 +61,7 @@ market_open_text:
 		t.Fatalf("write selectors: %v", err)
 	}
 
-	sel, err := iranbroker.Load(path)
+	sel, err := mofid.Load(path)
 	if err != nil {
 		t.Fatalf("Load() = %v", err)
 	}
@@ -81,7 +81,7 @@ market_open_text:
 }
 
 func TestLoadMissingFileIsNotAnError(t *testing.T) {
-	sel, err := iranbroker.Load(filepath.Join(t.TempDir(), "does-not-exist.yaml"))
+	sel, err := mofid.Load(filepath.Join(t.TempDir(), "does-not-exist.yaml"))
 	if err != nil {
 		t.Fatalf("Load() = %v, want nil for a missing file", err)
 	}

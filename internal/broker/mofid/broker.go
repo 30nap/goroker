@@ -1,4 +1,4 @@
-package iranbroker
+package mofid
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 
 // AdapterName is the value of broker.name in config.yaml that selects this
 // adapter.
-const AdapterName = "iranbroker"
+const AdapterName = "mofid"
 
 func init() {
 	broker.Register(AdapterName, func(deps broker.Deps) (broker.Adapter, error) {
@@ -28,7 +28,7 @@ func init() {
 	})
 }
 
-// Broker drives the brokerage web UI through Rod.
+// Broker drives the Mofid Easy Trader web UI through Rod.
 //
 // It holds no brokerage knowledge beyond the URLs in the configuration and the
 // selectors in selectors.go, and it never submits an order on its own: the

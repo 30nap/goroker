@@ -1,4 +1,4 @@
-// Package iranbroker is the adapter for the user's Iranian brokerage web UI.
+// Package mofid is the adapter for Mofid Easy Trader (https://d.easytrader.ir/).
 //
 // Every brokerage-specific DOM selector in Goroker lives in this file. Nothing
 // above this package may contain a selector.
@@ -7,7 +7,7 @@
 // the real brokerage site (see docs/broker-ui-analysis.md). They are never
 // guessed: an empty selector makes the corresponding operation fail closed with
 // domain.ErrSelectorMissing rather than act on the wrong element.
-package iranbroker
+package mofid
 
 import (
 	"fmt"
