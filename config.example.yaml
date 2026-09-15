@@ -1,0 +1,46 @@
+# Example Goroker configuration.
+#
+# Copy this to ~/.goroker/config.yaml and fill in the brokerage URLs.
+# It must never contain a username, password, OTP, cookie or token.
+# Every value here can be overridden by an environment variable, for example
+# GOROKER_WATCH_INTERVAL=5s or GOROKER_BROWSER_HEADLESS=true.
+
+broker:
+  # Adapter to use. "iranbroker" is the adapter in internal/broker/iranbroker.
+  name: iranbroker
+  # Name shown by `goroker status`.
+  display_name: unknown
+  # Filled in during broker discovery (Phase 2).
+  base_url: ""
+  login_url: ""
+  trading_url: ""
+
+browser:
+  # Trading interaction should be visible. Keep this false.
+  headless: false
+  # Leave empty to let Rod find Chromium, or pin a binary path.
+  bin_path: ""
+  # Bounds a single browser operation.
+  timeout: 30s
+  # Adds a delay between browser actions; useful while developing.
+  slow_motion: 0s
+  # How long Goroker waits while you complete an OTP/CAPTCHA/device challenge.
+  manual_challenge_timeout: 5m
+
+watch:
+  # How often the live quote is read. Keep this gentle.
+  interval: 2s
+  # The oldest a quote may be and still support a trading decision.
+  max_quote_age: 5s
+
+order:
+  # How long the confirmation prompt stays valid before it expires.
+  confirmation_timeout: 15s
+
+logging:
+  level: info
+  format: text
+
+debug:
+  # Save a screenshot when UI automation fails, under ~/.goroker/debug/.
+  screenshots: true

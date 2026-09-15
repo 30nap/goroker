@@ -1,0 +1,23 @@
+{
+  "_comment": "Price strings as they can appear in an Iranian brokerage UI, with the integer Goroker must read from each. Real samples from the broker's DOM are added here during broker discovery.",
+  "valid": [
+    {"raw": "3310", "want": 3310},
+    {"raw": "3,310", "want": 3310},
+    {"raw": "۳۳۱۰", "want": 3310},
+    {"raw": "۳,۳۱۰", "want": 3310},
+    {"raw": "٣٣١٠", "want": 3310},
+    {"raw": "33,100,000", "want": 33100000},
+    {"raw": "۳۳٬۱۰۰٬۰۰۰", "want": 33100000},
+    {"raw": " 3 310 ", "want": 3310},
+    {"raw": "3310 ریال", "want": 3310},
+    {"raw": "قیمت: ۳,۳۱۰ ریال", "want": 3310},
+    {"raw": "3.310", "want": 3310}
+  ],
+  "invalid": [
+    {"raw": "", "why": "no digits at all"},
+    {"raw": "—", "why": "placeholder shown when the broker has no value"},
+    {"raw": "ندارد", "why": "text instead of a number"},
+    {"raw": "3310.5", "why": "fractional price cannot be entered as an integer"},
+    {"raw": "۳۳۱۰٫۲۵", "why": "fractional price with a Persian decimal separator"}
+  ]
+}

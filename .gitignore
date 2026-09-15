@@ -1,0 +1,29 @@
+# Build output
+/goroker
+/dist/
+*.exe
+
+# Local application data — never commit any of this.
+# The browser profile contains cookies and authentication state for a real
+# brokerage account.
+.goroker/
+browser-profile/
+debug/
+*.png
+
+# Credentials and local environment
+.env
+.env.*
+!.env.example
+selectors.local.yaml
+
+# Go
+*.test
+*.out
+coverage.*
+
+# Editors
+.idea/
+.vscode/
+*.swp
+.DS_Store
